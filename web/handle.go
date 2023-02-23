@@ -55,15 +55,10 @@ func handleError(w http.ResponseWriter, err error) {
 func handleSuccess(w http.ResponseWriter, data interface{}) {
 	w.WriteHeader(200)
 	w.Header().Set("content-type", "application/json")
-	marshal, err := json.Marshal(data)
+	err := json.NewEncoder(w).Encode(data)
 	if err != nil {
 		logError(err.Error())
 		_, _ = w.Write([]byte("{\"msg\":\"data marshal error\"}"))
-	} else {
-		_, err := w.Write(marshal)
-		if err != nil {
-			logError(err.Error())
-		}
 	}
 }
 
