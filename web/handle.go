@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"unsafe"
 )
 
 // 日志，有需要请替换
@@ -67,34 +66,4 @@ func (h *Handle) requestType() reflect.Type {
 	// 本来函数 Method 是 func(*T)
 	// 这里返回的是 T 类型
 	return reflect.TypeOf(h.Method).In(0).Elem()
-}
-
-// ================================= 遗留的奇怪函数 =============================
-
-type interfaceHeader struct {
-	runtimeType uintptr
-	ptr         uintptr
-}
-
-func runtimeType(t reflect.Type) uintptr {
-	_, ptr := breakInterface(t)
-	return ptr
-}
-
-func breakInterface(i interface{}) (runtimeType, ptr uintptr) {
-	h := (*interfaceHeader)(unsafe.Pointer(&i))
-	return h.runtimeType, h.ptr
-}
-
-func makeInterface(runtimeType, ptr uintptr) interface{} {
-	return *((*interface{})(unsafe.Pointer(&interfaceHeader{
-		runtimeType: runtimeType,
-		ptr:         ptr,
-	})))
-}
-
-func interfaceOf(typeInfo interface{}, value interface{}) interface{} {
-	runtimeType, _ := breakInterface(typeInfo)
-	_, valuePtr := breakInterface(value)
-	return makeInterface(runtimeType, valuePtr)
 }
