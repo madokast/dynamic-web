@@ -35,7 +35,7 @@ func (h *Handle) HTTPHandle() func(w http.ResponseWriter, r *http.Request) {
 		called := reflect.ValueOf(h.Method).Call([]reflect.Value{reflect.ValueOf(request)})
 		res := called[0].Interface()
 		ierr := called[1].Interface()
-		if err, ok := ierr.(error); ok {
+		if err, ok := ierr.(error); ok && err != nil {
 			handleError(w, err)
 		} else {
 			handleSuccess(w, res)
